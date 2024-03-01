@@ -6,7 +6,7 @@
 [![Commit activity](https://img.shields.io/github/commit-activity/m/fpgmaas/dataset-extractor-lotus)](https://img.shields.io/github/commit-activity/m/fpgmaas/dataset-extractor-lotus)
 [![License](https://img.shields.io/github/license/fpgmaas/dataset-extractor-lotus)](https://img.shields.io/github/license/fpgmaas/dataset-extractor-lotus)
 
-extract specific lines from the lotus-dataset (https://zenodo.org/records/7534071).
+Extract specific elements from the LOTUS dataset.
 
 - **Github repository**: <https://github.com/fpgmaas/dataset-extractor-lotus/>
 - **Documentation** <https://fpgmaas.github.io/dataset-extractor-lotus/>

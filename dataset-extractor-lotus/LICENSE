@@ -1,7 +1,7 @@
 GNU GENERAL PUBLIC LICENSE
                       Version 3, 29 June 2007
 
-    extract specific lines from the lotus-dataset (https://zenodo.org/records/7534071).
+    Extract specific elements from the LOTUS dataset.
     Copyright (C) 2024  Pascal Amrein
 
     This program is free software: you can redistribute it and/or modify

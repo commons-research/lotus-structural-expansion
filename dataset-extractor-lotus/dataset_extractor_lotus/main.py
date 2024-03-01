@@ -1,8 +1,6 @@
-import numpy as np
-import pandas as pd
+import polars as pl
 
 
-print("hello world")
+print("hello")
 
-df = pd.DataFrame(1,2)
-print(df)
+pl.read_csv("data.csv", separator="|")  

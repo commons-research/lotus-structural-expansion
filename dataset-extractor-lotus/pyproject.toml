@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "dataset_extractor_lotus"
 version = "0.0.1"
-description = "extract specific lines from the lotus-dataset (https://zenodo.org/records/7534071)."
+description = "Extract specific elements from the LOTUS dataset."
 authors = ["Pascal Amrein <fpascal.amrein@unifr.ch>"]
 repository = "https://github.com/fpgmaas/dataset-extractor-lotus"
 documentation = "https://fpgmaas.github.io/dataset-extractor-lotus/"
@@ -11,7 +11,8 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.9"
+python = ">=3.9,<=3.10"
+polars = "^0.20.13"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
@@ -19,10 +20,7 @@ mypy = "^1.5.1"
 pre-commit = "^3.4.0"
 tox = "^4.11.1"
 
-[tool.poetry.group.docs.dependencies]
-mkdocs = "^1.4.2"
-mkdocs-material = "^9.2.7"
-mkdocstrings = {extras = ["python"], version = "^0.23.0"}
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
