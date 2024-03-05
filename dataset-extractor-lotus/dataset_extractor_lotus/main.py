@@ -2,6 +2,7 @@
 # extract a small LOTUS dataset to sample N lines from M members of taxa level T.
 
 import polars as pl     # for data manipulation
+import numpy as np      # specialy for NaN
 import sys              # for command line arguments
 import getopt           # for checking command line arguments
 import datetime         # for naming the output file
@@ -45,7 +46,7 @@ def read_arg(argv):
     # 'structure_taxonomy_classyfire_03class',
     # 'structure_taxonomy_classyfire_04directparent']
     arg_taxalevel = "organism_taxonomy_07tribe"
-    
+
     arg_members_of_taxalevel = 3
     arg_samplesize_per_member = 5
     arg_output_path = ""
@@ -77,7 +78,8 @@ def read_arg(argv):
     
     # Output file naming
     datestemp = datetime.datetime.now().strftime("%Y%m%d")
-    arg_output_path = datestemp + "_taxlevel_" + arg_taxalevel.split("_")[2] + "_samplesize_" + str(int(arg_members_of_taxalevel)*int(arg_samplesize_per_member)) + ".csv"
+    filename = datestemp + "_taxlevel_" + arg_taxalevel.split("_")[2] + "_samplesize_" + str(int(arg_members_of_taxalevel)*int(arg_samplesize_per_member)) + ".csv"
+    arg_output_file = arg_output_path + filename
 
     # # Check the output
     # print('output_path:', arg_output_path, type(arg_output_path))
@@ -85,7 +87,7 @@ def read_arg(argv):
     # print('members_of_taxalevel:', arg_members_of_taxalevel, type(arg_members_of_taxalevel))
     # print('samplesize_per_member:', arg_samplesize_per_member, type(arg_samplesize_per_member))
 
-    return arg_output_path, arg_taxalevel, int(arg_members_of_taxalevel), int(arg_samplesize_per_member)
+    return arg_output_file, arg_taxalevel, int(arg_members_of_taxalevel), int(arg_samplesize_per_member)
 
 
 ########
@@ -104,7 +106,7 @@ if __name__ == "__main__":
     samplesize_per_member = samplesize_per_member
 
 
-# read the data in
+# import the data
 df = pl.read_csv(
         path_to_file,
         dtypes={
@@ -120,9 +122,16 @@ df = pl.read_csv(
         null_values=["", "NA"],
     )
 
+df = df.with_columns(
+        pl.col("organism_taxonomy_gbifid")
+        .map_elements(lambda x: np.nan if x.startswith("c(") else x)
+        .cast(pl.UInt32)
+        .alias("organism_taxonomy_gbifid")
+    )
+
 # get all possible options for members and check the amount of members
 members_list = df[taxalevel].unique()
-print(len(members_list), members_of_taxalevel)
+
 if len(members_list) < members_of_taxalevel:
     print("The amount of members is less than the amount of members to sample.")
     print("Please choose a smaller amount of members to sample.")
@@ -134,27 +143,23 @@ very_important_members = members_list.sample(n=members_of_taxalevel)
 # empty final dataset
 data_toy = df.clear()
 
-# empty list for amount stored
-data_size_after = []
-data_size_before = []
-
-
 # sample from each "very important member" N lines
 for important_member in very_important_members:
 
     # filter the "important member" and check, if the amount of possible samples is less than the amount of samplesize
     data_vim = df.filter(pl.col(taxalevel) == important_member)
     if len(data_vim) < samplesize_per_member:
-        print("The amount of possible samples in ", len(data_vim), " is less than the amount of `samplesize per member` (", samplesize_per_member,").")
+        print("The amount of possible samples in ", important_member, "(", len(data_vim), ") is less than the amount of `samplesize per member` (", samplesize_per_member,").")
         print("Please choose a smaller amount of samplesize.")
         sys.exit(2)
+    else:
+        print("Taxa:", important_member, "-", round(samplesize_per_member/len(data_vim), 2), "-", samplesize_per_member, "/", len(data_vim))
 
     # sample N lines from the "important member"
     data_vim = data_vim.sample(n=samplesize_per_member)
 
     # store this dataframe in the final dataframe
     data_toy.extend(data_vim)
-
 
 # save the final dataframe in a *.csv file
 data_toy.write_csv(outputfilename)
